@@ -146,3 +146,8 @@ I need to inject the following values:
 
 Somehow I need to stuff all this stuff into a string and grab the storage account name from the "azurerm_storage_account" resource "diag-storage-acct".
 
+## Troubleshooting
+
+### Cluserid cannot be null or empty
+
+VM has reported a failure when processing extension 'ServiceFabricNodeVmExt'. Error message: "Invalid operation. ClusterId cannot be null or empty.".
