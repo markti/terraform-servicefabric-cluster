@@ -46,6 +46,11 @@ I need to inject the following values:
 2. azurerm_storage_account.log-storage-acct.secondary_access_key
 
 
+Example terraform JSON value:
+
+protected_settings = "{\"StorageAccountKey1\": \"${azurerm_storage_account.log-storage-acct.primary_access_key}\", \"StorageAccountKey2\": \"${azurerm_storage_account.log-storage-acct.secondary_access_key}\"}"
+
+
 
 It's settings contain a number of configuration settings:
 
