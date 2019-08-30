@@ -11,6 +11,15 @@ Read steve-hawkins [post](https://github.com/terraform-providers/terraform-provi
 > This setup is the minimum that should get you started, further resources will be required for a secure, monitored, etc production ready Service Fabric cluster
 > I also suggest reviewing the Microsoft Service Fabric Resource Manager documentation as well as the Quick Start Templates
 
+## Prepping a cluster certificate
+
+I used these [powershell scripts](https://github.com/ChackDan/Service-Fabric/tree/master/Scripts/ServiceFabricRPHelpers) to get the certificate into key vault. 'Invoke-AddCertToKeyVault' is the magic command that will take the cert and put it into KeyVault the way the RGT is expecting it.
+
+Invoke-AddCertToKeyVault -SubscriptionId "<yourSubscription>" -ResourceGroupName <resourceGroupForVault> -Location eastus -VaultName "<yourVault>" -CertificateName "<certificateName>" -Password "<certificatePassword>" -UseExistingCertificate -ExistingPfxFilePath "C:\src\stuff\mycert.pfx"
+
+
+## Getting it working...
+
 
 While I find Microsoft's support here extremely disappointing, the process of reverse engineering the ARM template has really helped me fully understand each infrastructure component and its dependencies within the environment.
 

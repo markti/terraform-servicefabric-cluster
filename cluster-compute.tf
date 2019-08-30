@@ -2,7 +2,7 @@
 
 
 resource "azurerm_virtual_machine_scale_set" "cluster-scaleset" {
-    
+
     name                = "${local.cluster_name}-scaleset"
     location            = "${azurerm_resource_group.cluster-rg.location}"
     resource_group_name = "${azurerm_resource_group.cluster-rg.name}"
@@ -46,7 +46,7 @@ resource "azurerm_virtual_machine_scale_set" "cluster-scaleset" {
     }
 
     network_profile {
-        name    = "terraformnetworkprofile"
+        name    = "${local.cluster_name}-networkProfile"
         primary = true
 
         ip_configuration {
@@ -68,15 +68,15 @@ resource "azurerm_virtual_machine_scale_set" "cluster-scaleset" {
 
         protected_settings = <<EOT
 {
-    "StorageAccountKey1": "$${azurerm_storage_account.log-storage-acct.primary_access_key}",
-    "StorageAccountKey2": "$${azurerm_storage_account.log-storage-acct.primary_access_key}"
+    "StorageAccountKey1": "${azurerm_storage_account.log-storage-acct.primary_access_key}",
+    "StorageAccountKey2": "${azurerm_storage_account.log-storage-acct.secondary_access_key}"
 }
         EOT
 
         settings = <<EOT
 
 {
-    "clusterEndpoint": "$$(azurerm_service_fabric_cluster.sf-cluster.cluster_endpoint)",
+    "clusterEndpoint": "https://${local.cluster_name}.eastus.cloudapp.azure.com:19000",
     "nodeTypeRef": "clustervm",
     "dataPath": "D:\\SvcFab",
     "durabilityLevel": "Bronze",
@@ -102,8 +102,8 @@ resource "azurerm_virtual_machine_scale_set" "cluster-scaleset" {
 
         protected_settings = <<EOT
 {
-    "storageAccountName": "$${azurerm_storage_account.diag-storage-acct.name}",
-    "storageAccountKey": "$${azurerm_storage_account.diag-storage-acct.primary_access_key}",
+    "storageAccountName": "${azurerm_storage_account.diag-storage-acct.name}",
+    "storageAccountKey": "${azurerm_storage_account.diag-storage-acct.primary_access_key}",
     "storageAccountEndPoint": "https://core.windows.net/"
 }
         EOT
@@ -146,12 +146,12 @@ resource "azurerm_virtual_machine_scale_set" "cluster-scaleset" {
         }
         }
     },
-    "StorageAccount": "$${azurerm_storage_account.diag-storage-acct.name}"
+    "StorageAccount": "${azurerm_storage_account.diag-storage-acct.name}"
 }
 
         EOT
 
     }
 
-
+    tags = "${local.default_tags}"
 }
