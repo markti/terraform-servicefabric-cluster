@@ -4,16 +4,17 @@ resource "azurerm_virtual_network" "cluster-vnet" {
     name                = "${local.cluster_name}-vnet"
     resource_group_name = "${azurerm_resource_group.cluster-rg.name}"
     location            = "${azurerm_resource_group.cluster-rg.location}"
-    address_space       = ["10.0.0.0/16"]
+    address_space       = ["${var.vnet_address_space}"]
 
     tags = "${local.default_tags}"
 }
 
 resource "azurerm_subnet" "cluster-subnet" {
-    name                 = "${local.cluster_name}-subnet1"
-    resource_group_name = "${azurerm_resource_group.cluster-rg.name}"
-    virtual_network_name = "${azurerm_virtual_network.cluster-vnet.name}"
-    address_prefix       = "10.0.0.0/24"
+    name                        = "${local.cluster_name}-subnet1"
+    resource_group_name         = "${azurerm_resource_group.cluster-rg.name}"
+    virtual_network_name        = "${azurerm_virtual_network.cluster-vnet.name}"
+    address_prefix              = "${var.subnet1_address_space}"
+    network_security_group_id   = "${azurerm_network_security_group.cluster-nsg.id}"
 }
 
 resource "azurerm_public_ip" "cluster-pip" {

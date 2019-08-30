@@ -160,3 +160,16 @@ Somehow I need to stuff all this stuff into a string and grab the storage accoun
 ### Cluserid cannot be null or empty
 
 VM has reported a failure when processing extension 'ServiceFabricNodeVmExt'. Error message: "Invalid operation. ClusterId cannot be null or empty.".
+
+I'm assuming that this excerpt from the RGT 
+
+```
+[reference(parameters('clusterName')).clusterEndpoint] 
+```
+
+gets mapped into this: 
+
+```
+"clusterEndpoint": "https://${local.cluster_name}.eastus.cloudapp.azure.com:19000"
+```
+

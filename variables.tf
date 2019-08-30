@@ -17,3 +17,10 @@ variable "sf_http_gateway_port" {
 variable "sf_cluster_vault_url" {}
 variable "sf_cluster_cert_url" {}
 variable "sf_cluster_cert_thumb" {}
+
+variable "vnet_address_space" {
+    default = "10.0.0.0/16"
+}
+variable "subnet1_address_space" {
+    default = "10.0.0.0/24"
+}
