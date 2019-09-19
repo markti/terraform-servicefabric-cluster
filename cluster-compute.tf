@@ -1,5 +1,26 @@
 
 
+locals {
+    
+    sf_settings_template = <<JSON
+
+{
+    "clusterEndpoint": "https://CLUSTER_NAME.eastus.cloudapp.azure.com:19000",
+    "nodeTypeRef": "clustervm",
+    "dataPath": "D:\\SvcFab",
+    "durabilityLevel": "Bronze",
+    "enableParallelJobs": true,
+    "nicPrefixOverride": "INSERT_SUBNET_RANGE_HERE",
+    "certificate": {
+        "thumbprint": "INSERT_THUMBPRINT_HERE",
+        "x509StoreName": "My"
+    }
+}
+
+JSON
+
+}
+
 
 resource "azurerm_virtual_machine_scale_set" "cluster-scaleset" {
 
@@ -66,92 +87,14 @@ resource "azurerm_virtual_machine_scale_set" "cluster-scaleset" {
         type_handler_version        = "1.0"
         auto_upgrade_minor_version  = true
 
-        protected_settings = <<EOT
-{
-    "StorageAccountKey1": "${azurerm_storage_account.log-storage-acct.primary_access_key}",
-    "StorageAccountKey2": "${azurerm_storage_account.log-storage-acct.secondary_access_key}"
-}
-        EOT
-
-        settings = <<EOT
-
-{
-    "clusterEndpoint": "https://${local.cluster_name}.eastus.cloudapp.azure.com:19000",
-    "nodeTypeRef": "clustervm",
-    "dataPath": "D:\\SvcFab",
-    "durabilityLevel": "Bronze",
-    "enableParallelJobs": true,
-    "nicPrefixOverride": "10.0.0.0/24",
-    "certificate": {
-        "thumbprint": "${var.sf_cluster_cert_thumb}",
-        "x509StoreName": "My"
-    }
-}
-
-        EOT
-
+        settings = "$(local.sf_settings_template)"
+        
     }
 
-    
-    extension {
-        name                        = "VMDiagnosticsVmExt"
-        publisher                   = "Microsoft.Azure.Diagnostics"
-        type                        = "IaaSDiagnostics"
-        type_handler_version        = "1.5"
-        auto_upgrade_minor_version  = true
-
-        protected_settings = <<EOT
-{
-    "storageAccountName": "${azurerm_storage_account.diag-storage-acct.name}",
-    "storageAccountKey": "${azurerm_storage_account.diag-storage-acct.primary_access_key}",
-    "storageAccountEndPoint": "https://core.windows.net/"
-}
-        EOT
-
-        settings = <<EOT
-
-{
-    "WadCfg": {
-        "DiagnosticMonitorConfiguration": {
-        "overallQuotaInMB": "50000",
-        "EtwProviders": {
-            "EtwEventSourceProviderConfiguration": [
-            {
-                "provider": "Microsoft-ServiceFabric-Actors",
-                "scheduledTransferKeywordFilter": "1",
-                "scheduledTransferPeriod": "PT5M",
-                "DefaultEvents": {
-                "eventDestination": "ServiceFabricReliableActorEventTable"
-                }
-            },
-            {
-                "provider": "Microsoft-ServiceFabric-Services",
-                "scheduledTransferPeriod": "PT5M",
-                "DefaultEvents": {
-                "eventDestination": "ServiceFabricReliableServiceEventTable"
-                }
-            }
-            ],
-            "EtwManifestProviderConfiguration": [
-            {
-                "provider": "cbd93bc2-71e5-4566-b3a7-595d8eeca6e8",
-                "scheduledTransferLogLevelFilter": "Information",
-                "scheduledTransferKeywordFilter": "4611686018427387904",
-                "scheduledTransferPeriod": "PT5M",
-                "DefaultEvents": {
-                "eventDestination": "ServiceFabricSystemEventTable"
-                }
-            }
-            ]
-        }
-        }
-    },
-    "StorageAccount": "${azurerm_storage_account.diag-storage-acct.name}"
-}
-
-        EOT
-
-    }
 
     tags = "${local.default_tags}"
+}
+
+output "template" {
+  value = "${local.sf_settings_template}"
 }
